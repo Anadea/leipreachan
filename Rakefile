@@ -1,2 +1,2 @@
 require "bundler/gem_tasks"
-import "./lib/tasks/leipreachan/db_backup.rake"
+Dir.glob('lib/tasks/*.rake').each {|r| import r}
