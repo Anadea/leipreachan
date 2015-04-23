@@ -1,2 +1,2 @@
 require "bundler/gem_tasks"
-import "./lib/tasks/db_backup.rake"
+import "./lib/tasks/leipreachan/db_backup.rake"
