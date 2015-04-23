@@ -1,4 +1,5 @@
-require "leipreachan/version"
+require 'leipreachan/version'
+require 'leipreachan/railtie' if defined?(Rails)
 
 module Leipreachan
   class DBBackup
