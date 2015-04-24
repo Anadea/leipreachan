@@ -124,7 +124,6 @@ module Leipreachan
     end
 
     def drop_pg!
-      file = get_file_for_restore
       username = config['username'].present? ? "-U #{config['username']}" : ""
       password = config['password'].present? ? "PGPASSWORD='#{config['password']}'" : ""
       drop_table_query = "drop schema public cascade; create schema public;"
@@ -137,6 +136,8 @@ module Leipreachan
       username = config['username'].present? ? "-U #{config['username']}" : ""
       password = config['password'].present? ? "PGPASSWORD='#{config['password']}'" : ""
 
+      puts "Will be restored -> #{file}"
+      puts ""
       drop_pg!
       system("zcat < #{backup_base_on(@target_date)}/#{file} | #{password} psql #{username} #{config['database']}")
     end
