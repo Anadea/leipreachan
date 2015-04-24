@@ -1,5 +1,7 @@
 require 'leipreachan/version'
 require 'leipreachan/railtie' if defined?(Rails)
+require 'rails'
+require 'active_record'
 
 module Leipreachan
   class DBBackup
@@ -75,6 +77,14 @@ module Leipreachan
       @db_config
     end
 
+    def backup_base
+      @backup_base
+    end
+
+    def backup_file
+      @backup_file
+    end
+
     def remove_unwanted_backups
       all_backups = backup_folder_items
 
@@ -90,13 +100,12 @@ module Leipreachan
     def backup_pg!
       username = config['username'].present? ? "-U #{config['username']}" : ""
       password = config['password'].present? ? "PGPASSWORD='#{config['password']}'" : ""
-      `#{password} pg_dump #{username} #{config['database']} | gzip > #{@backup_file}.gz`
-      raise "Unable to make DB backup!" if ( $?.to_i > 0 )
+      system("#{password} pg_dump #{username} #{config['database']} | gzip > #{backup_file}.gz")
     end
 
     def backup_mysql!
-      `mysqldump -u#{config['username']} -p#{config['password']} -i -c -q --single-transaction #{config['database']} | gzip > #{@backup_file}.gz`
-      raise "Unable to make DB backup!" if ( $?.to_i > 0 )
+      password = config['password'].present? ? "-p#{config['password']}" : ""
+      system("mysqldump -u#{config['username']} #{password} -i -c -q --single-transaction #{config['database']} | gzip > #{backup_file}.gz")
     end
 
     def get_file_for_restore
@@ -112,23 +121,31 @@ module Leipreachan
       STDIN.gets.chomp.presence || backups_list.last
     end
 
-    def restore_pg!
+    def drop_pg!
       file = get_file_for_restore
       username = config['username'].present? ? "-U #{config['username']}" : ""
       password = config['password'].present? ? "PGPASSWORD='#{config['password']}'" : ""
       drop_table_query = "drop schema public cascade; create schema public;"
 
-      `echo "#{drop_table_query}" | #{password} psql #{username} #{config['database']}`
-      `zcat < #{@backup_base}/#{file} | #{password} psql #{username} #{config['database']}`
+      system("echo \"#{drop_table_query}\" | #{password} psql #{username} #{config['database']}")
+    end
+
+    def restore_pg!
+      file = get_file_for_restore
+      username = config['username'].present? ? "-U #{config['username']}" : ""
+      password = config['password'].present? ? "PGPASSWORD='#{config['password']}'" : ""
+
+      drop_pg!
+      system("zcat < #{backup_base}/#{file} | #{password} psql #{username} #{config['database']}")
     end
 
     def restore_mysql!
       file = get_file_for_restore
-      `zcat < #{@backup_base}/#{file} | mysql -u#{config['username']} -p#{config['password']} #{config['database']}`
+      system("zcat < #{backup_base}/#{file} | mysql -u#{config['username']} -p#{config['password']} #{config['database']}")
     end
 
     def backup_folder_items
-      Dir.new(@backup_base).entries.select{|name| name.match(/sql.gz$/)}.sort.reverse
+      Dir.new(backup_base).entries.select{|name| name.match(/sql.gz$/)}.sort.reverse
     end
   end
 end
