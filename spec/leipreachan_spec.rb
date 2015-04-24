@@ -4,13 +4,53 @@ module Rails; end unless defined?(Rails)
 
 describe Leipreachan do
   before do
-    Rails.stub(:root).and_return('/rails/root')
+    Rails.stub(:root).and_return('/tmp/Rails')
     Rails.stub(:env).and_return('test')
     Dir.stub(:new).and_return(['.', '..', '.DStore', '20150404000000.sql.gz', '20150403000000.sql.gz'])
   end
 
   it 'has a version number' do
     expect(Leipreachan::VERSION).not_to be nil
+  end
+
+  it 'defaults (max, date, dir)' do
+    instance = Leipreachan::DBBackup.new Rails.env
+    expect(instance.max_files).to eq(30)
+    expect(instance.directory).to eq("backups")
+    expect(instance.target_date).to eq(Date.current.strftime("%Y%m%d"))
+  end
+
+  it 'set MAX from ENV' do
+    instance = Leipreachan::DBBackup.new({'MAX' => 100})
+    expect(instance.max_files).to eq(100)
+  end
+
+  it 'set DATE from ENV' do
+    instance = Leipreachan::DBBackup.new({'DATE' => "20150404"})
+    expect(instance.target_date).to eq("20150404")
+  end
+
+  it 'set DIR form ENV' do
+    instance = Leipreachan::DBBackup.new({'DIR' => "blah"})
+    expect(instance.directory).to eq("blah")
+  end
+
+  it 'remove unwanted backups' do
+    instance = Leipreachan::DBBackup.new({'MAX' => 2})
+    Dir.unstub(:new)
+    folder = File.join(Rails.root, 'backups',Date.current.strftime("%Y%m%d"))
+    FileUtils.mkdir_p(folder)
+    FileUtils.touch("#{folder}/201504010000.sql.gz")
+    FileUtils.touch("#{folder}/201504010001.sql.gz")
+    FileUtils.touch("#{folder}/201504010002.sql.gz")
+    FileUtils.touch("#{folder}/201504010003.sql.gz")
+    FileUtils.touch("#{folder}/201504010004.sql.gz")
+    FileUtils.touch("#{folder}/201504010005.sql.gz")
+    FileUtils.touch("#{folder}/201504010006.sql.gz")
+
+    instance.send(:remove_unwanted_backups)
+    expect(instance.send(:backup_folder_items)).to eq(['201504010006.sql.gz', '201504010005.sql.gz'])
+    FileUtils.rm_rf(Rails.root)
   end
 
   context 'Backup database without password' do

@@ -5,12 +5,17 @@ require 'active_record'
 
 module Leipreachan
   class DBBackup
+    MAX_FILES = 30
+    DIRECTORY = 'backups'
+
+    attr_accessor :max_files, :directory, :target_date
+
     def initialize env
-      @max_files = env['MAX'].to_i
+      @max_files = (env['MAX'] || MAX_FILES).to_i
       @target_date = env['DATE'] || Time.now.strftime("%Y%m%d")
-      directory = env['DIR']
+      @directory = env['DIR'] || DIRECTORY
       datetime_stamp = Time.now.strftime("%Y%m%d%H%M%S")
-      @base_path = File.join(Rails.root, directory || "backups")
+      @base_path = File.join(Rails.root, @directory)
 
       file_name = "#{datetime_stamp}.sql"
       @backup_file = File.join(backup_base_on(@target_date), file_name)
@@ -90,7 +95,7 @@ module Leipreachan
     def remove_unwanted_backups
       all_backups = backup_folder_items
 
-      max_backups = (@max_files if @max_files > 0) || 30
+      max_backups = (@max_files if @max_files > 0) || MAX_FILES
       unwanted_backups = all_backups[max_backups..-1] || []
 
       for unwanted_backup in unwanted_backups
