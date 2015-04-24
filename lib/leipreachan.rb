@@ -7,25 +7,23 @@ module Leipreachan
   class DBBackup
     def initialize env
       @max_files = env['MAX'].to_i
-      @target_date = env['DATE']
+      @target_date = env['DATE'] || Time.now.strftime("%Y%m%d")
       directory = env['DIR']
-      date_stamp = Time.now.strftime("%Y%m%d")
       datetime_stamp = Time.now.strftime("%Y%m%d%H%M%S")
       @base_path = File.join(Rails.root, directory || "backups")
-      @backup_base = File.join(@base_path, @target_date || date_stamp)
 
       file_name = "#{datetime_stamp}.sql"
-      @backup_file = File.join(@backup_base, file_name)
+      @backup_file = File.join(backup_base_on(@target_date), file_name)
 
       @db_config = ActiveRecord::Base.configurations[Rails.env]
     end
 
     def backup!
-      FileUtils.mkdir_p(@backup_base)
+      FileUtils.mkdir_p(backup_base_on(@target_date))
       case config['adapter']
       when 'postgresql'
         backup_pg!
-      when 'mysql'
+      when 'mysql', 'mysql2'
         backup_mysql!
       else
         raise "Incorrect adapter name!"
@@ -39,7 +37,7 @@ module Leipreachan
       case config['adapter']
       when 'postgresql'
         restore_pg!
-      when 'mysql'
+      when 'mysql', 'mysql2'
         restore_mysql!
       else
         raise "Incorrect adapter name!"
@@ -57,28 +55,32 @@ module Leipreachan
     def all_dates
       list = Dir.new(@base_path).entries.select{|name| name.match(/\d+/)}.sort
       list.first(list.size - 1).each_with_index do |folder, index|
-        count = Dir.new(File.join(@base_path, folder)).entries.select{|name| name.match(/sql.gz$/)}.size
+        count = get_backups_list(folder).size
         puts "-> #{folder}: #{count}"
       end
       single_date list.last
     end
 
     def single_date date
-      count = Dir.new(File.join(@base_path, date)).entries.select{|name| name.match(/sql.gz$/)}.size
+      count = get_backups_list(date).size
       puts "-> #{date}: #{count}"
-      Dir.new(File.join(@base_path, date)).entries.select{|name| name.match(/sql.gz$/)}.each_with_index do |backup, index|
+      get_backups_list(date).each_with_index do |backup, index|
         puts "   #{backup}"
       end
     end
 
     private
 
+    def get_backups_list folder
+      Dir.new(backup_base_on(folder)).entries.select{|name| name.match(/sql.gz$/)}.sort
+    end
+
     def config
       @db_config
     end
 
-    def backup_base
-      @backup_base
+    def backup_base_on target_date
+      File.join(@base_path, target_date)
     end
 
     def backup_file
@@ -92,7 +94,7 @@ module Leipreachan
       unwanted_backups = all_backups[max_backups..-1] || []
 
       for unwanted_backup in unwanted_backups
-        FileUtils.rm_rf(File.join(@backup_base, unwanted_backup))
+        FileUtils.rm_rf(File.join(backup_base_on(@target_date), unwanted_backup))
       end
       puts "Deleted #{unwanted_backups.length} backups, #{all_backups.length - unwanted_backups.length} backups available"
     end
@@ -136,16 +138,16 @@ module Leipreachan
       password = config['password'].present? ? "PGPASSWORD='#{config['password']}'" : ""
 
       drop_pg!
-      system("zcat < #{backup_base}/#{file} | #{password} psql #{username} #{config['database']}")
+      system("zcat < #{backup_base_on(@target_date)}/#{file} | #{password} psql #{username} #{config['database']}")
     end
 
     def restore_mysql!
       file = get_file_for_restore
-      system("zcat < #{backup_base}/#{file} | mysql -u#{config['username']} -p#{config['password']} #{config['database']}")
+      system("zcat < #{backup_base_on(@target_date)}/#{file} | mysql -u#{config['username']} -p#{config['password']} #{config['database']}")
     end
 
     def backup_folder_items
-      Dir.new(backup_base).entries.select{|name| name.match(/sql.gz$/)}.sort.reverse
+      get_backups_list(@target_date).reverse
     end
   end
 end

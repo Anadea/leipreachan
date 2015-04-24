@@ -16,7 +16,7 @@ describe Leipreachan do
   context 'Backup database without password' do
     before do
       ActiveRecord::Base.stub(:configurations).and_return({'test' => {'username' => 'login', 'password' => '', 'database' => 'dbname'}})
-      instance.stub!(:backup_base).and_return('.')
+      instance.stub!(:backup_base_on).and_return('.')
       instance.stub!(:backup_file).and_return('201504040000.sql')
     end
 
@@ -36,7 +36,7 @@ describe Leipreachan do
   context 'Backup database with password' do
     before do
       ActiveRecord::Base.stub(:configurations).and_return({'test' => {'username' => 'login', 'password' => 'password', 'database' => 'dbname'}})
-      instance.stub!(:backup_base).and_return('.')
+      instance.stub!(:backup_base_on).and_return('.')
       instance.stub!(:backup_file).and_return('201504040000.sql')
     end
 
@@ -56,7 +56,7 @@ describe Leipreachan do
   context 'Restore database' do
     before do
       ActiveRecord::Base.stub(:configurations).and_return({'test' => {'username' => 'login', 'password' => 'password', 'database' => 'dbname'}})
-      instance.stub!(:backup_base).and_return('.')
+      instance.stub!(:backup_base_on).and_return('.')
       instance.stub!(:backup_file).and_return('201504040000.sql')
     end
 
@@ -84,13 +84,13 @@ describe Leipreachan do
   context 'Other checks' do
     before do
       ActiveRecord::Base.stub(:configurations).and_return({'test' => {'username' => 'login', 'password' => 'password', 'database' => 'dbname'}})
-      instance.stub!(:backup_base).and_return('.')
+      instance.stub!(:backup_base_on).and_return('.')
       instance.stub!(:backup_file).and_return('201504040000.sql')
     end
 
     let!(:instance) { Leipreachan::DBBackup.new Rails.env }
 
-    it 'backup_base return correct array' do
+    it 'backup_base_on return correct array' do
       expect(instance.send(:backup_folder_items)).to eq(['20150404000000.sql.gz', '20150403000000.sql.gz'])
     end
   end
