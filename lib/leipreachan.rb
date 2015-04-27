@@ -4,6 +4,13 @@ require 'rails'
 require 'active_record'
 
 module Leipreachan
+
+  def self.get_backuper_for env
+    config = ActiveRecord::Base.configurations[env]
+    require "leipreachan/#{config['adapter']}"
+    Backuper.new(env)
+  end
+
   class DBBackup
     MAX_FILES = 30
     DIRECTORY = 'backups'
@@ -20,33 +27,20 @@ module Leipreachan
       file_name = "#{datetime_stamp}.sql"
       @backup_file = File.join(backup_base_on(@target_date), file_name)
 
-      @db_config = ActiveRecord::Base.configurations[Rails.env]
+      @db_config = ActiveRecord::Base.configurations[env]
     end
 
     def backup!
       FileUtils.mkdir_p(backup_base_on(@target_date))
-      case config['adapter']
-      when 'postgresql'
-        backup_pg!
-      when 'mysql', 'mysql2'
-        backup_mysql!
-      else
-        raise "Incorrect adapter name!"
-      end
+      dbbackup!
       puts "Created backup: #{@backup_file}.gz"
 
       remove_unwanted_backups
     end
 
     def restore!
-      case config['adapter']
-      when 'postgresql'
-        restore_pg!
-      when 'mysql', 'mysql2'
-        restore_mysql!
-      else
-        raise "Incorrect adapter name!"
-      end
+      file = get_file_for_restore
+      dbrestore! file
     end
 
     def list
@@ -55,6 +49,12 @@ module Leipreachan
       else
         all_dates
       end
+    end
+
+    private
+
+    def get_backups_list folder
+      Dir.new(backup_base_on(folder)).entries.select{|name| name.match(/sql.gz$/)}.sort
     end
 
     def all_dates
@@ -72,12 +72,6 @@ module Leipreachan
       get_backups_list(date).each_with_index do |backup, index|
         puts "   #{backup}"
       end
-    end
-
-    private
-
-    def get_backups_list folder
-      Dir.new(backup_base_on(folder)).entries.select{|name| name.match(/sql.gz$/)}.sort
     end
 
     def config
@@ -104,17 +98,6 @@ module Leipreachan
       puts "Deleted #{unwanted_backups.length} backups, #{all_backups.length - unwanted_backups.length} backups available"
     end
 
-    def backup_pg!
-      username = config['username'].present? ? "-U #{config['username']}" : ""
-      password = config['password'].present? ? "PGPASSWORD='#{config['password']}'" : ""
-      system("#{password} pg_dump #{username} #{config['database']} | gzip > #{backup_file}.gz")
-    end
-
-    def backup_mysql!
-      password = config['password'].present? ? "-p#{config['password']}" : ""
-      system("mysqldump -u#{config['username']} #{password} -i -c -q --single-transaction #{config['database']} | gzip > #{backup_file}.gz")
-    end
-
     def get_file_for_restore
       backups_list = backup_folder_items.reverse
       backups_list.each_with_index do |backup, index|
@@ -126,30 +109,6 @@ module Leipreachan
       puts "="*80
       puts "Enter file name to restore: [#{backups_list.last}]"
       STDIN.gets.chomp.presence || backups_list.last
-    end
-
-    def drop_pg!
-      username = config['username'].present? ? "-U #{config['username']}" : ""
-      password = config['password'].present? ? "PGPASSWORD='#{config['password']}'" : ""
-      drop_table_query = "drop schema public cascade; create schema public;"
-
-      system("echo \"#{drop_table_query}\" | #{password} psql #{username} #{config['database']}")
-    end
-
-    def restore_pg!
-      file = get_file_for_restore
-      username = config['username'].present? ? "-U #{config['username']}" : ""
-      password = config['password'].present? ? "PGPASSWORD='#{config['password']}'" : ""
-
-      puts "Will be restored -> #{file}"
-      puts ""
-      drop_pg!
-      system("zcat < #{backup_base_on(@target_date)}/#{file} | #{password} psql #{username} #{config['database']}")
-    end
-
-    def restore_mysql!
-      file = get_file_for_restore
-      system("zcat < #{backup_base_on(@target_date)}/#{file} | mysql -u#{config['username']} -p#{config['password']} #{config['database']}")
     end
 
     def backup_folder_items
