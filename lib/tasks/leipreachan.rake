@@ -11,7 +11,7 @@ namespace :leipreachan do
     require 'leipreachan'
     Leipreachan.get_backuper_for(ENV).restore!
   end
-  task restore: [:environment] do
+  task restorelast: [:environment] do
     require 'leipreachan'
     Leipreachan.get_backuper_for(ENV).restorelast!
   end

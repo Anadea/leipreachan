@@ -28,9 +28,9 @@ namespace :deploy do
           with rails_env: fetch(:rails_env) do
             puts "="*80
             puts "WARNING!!! YOUR CURRENT DATABASE DATA WILL BE LOST!!!"
-            puts "Think twice before enter 'yes' and push the Enter button"
+            puts "Think twice before enter 'YES' and push the Enter button"
             puts "="*80
-            set :answercheck, ask('Please type "yes" for restore database: ', '')
+            set :answercheck, ask('Please type "YES" for restore database: ', '')
             if fetch(:answercheck) == 'YES'
               execute :bundle, :exec, :rake, "leipreachan:restorelast DIR=#{fetch(:folder)}"
             end
