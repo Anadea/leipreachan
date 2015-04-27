@@ -39,8 +39,11 @@ module Leipreachan
     end
 
     def restore!
-      file = get_file_for_restore
-      dbrestore! file
+      dbrestore! get_file_for_restore
+    end
+
+    def restorelast!
+      dbrestore! get_lastfile_for_restore
     end
 
     def list
@@ -109,6 +112,10 @@ module Leipreachan
       puts "="*80
       puts "Enter file name to restore: [#{backups_list.last}]"
       STDIN.gets.chomp.presence || backups_list.last
+    end
+
+    def get_lastfile_for_restore
+      backup_folder_items.reverse.last
     end
 
     def backup_folder_items
