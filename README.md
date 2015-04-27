@@ -60,7 +60,7 @@ Gem have a release path as a root folder.
   
   # you able to manage number of stored backups
   every 5.days, do
-    rake "leipreachan:backup MAX=5" # by default we are storing 5
+    rake "leipreachan:backup MAX=5" # by default we are storing 30
   end
 ```
 
