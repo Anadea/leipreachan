@@ -6,9 +6,7 @@ require 'active_record'
 module Leipreachan
 
   def self.get_backuper_for env
-    binding.pry
-    config = ActiveRecord::Base.configurations[env]
-    p config
+    config = ActiveRecord::Base.configurations[Rails.env]
     require "leipreachan/#{config['adapter']}"
     Backuper.new(env)
   end
@@ -29,7 +27,7 @@ module Leipreachan
       file_name = "#{datetime_stamp}.sql"
       @backup_file = File.join(backup_base_on(@target_date), file_name)
 
-      @db_config = ActiveRecord::Base.configurations[env]
+      @db_config = ActiveRecord::Base.configurations[Rails.env]
     end
 
     def backup!
