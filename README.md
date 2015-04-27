@@ -1,79 +1,69 @@
 # Leipreachan
 
-Database backup as simple as should be.
+Самый простой способ создания резервных копий базы данных проекта на сколько это вообще возможно.
 
-## Installation
+## Установка
 
-Add this line to your application's Gemfile:
+Добавьте эту строку в ваш Gemfile:
 
 ```ruby
 gem 'leipreachan'
 ```
 
-And then execute:
+После этого запустите:
 
     $ bundle
 
-Or install it yourself as:
+Или установите вручную:
 
     $ gem install leipreachan
 
-## Usage
+## Использование
 
 ### Capistrano 3
 
-For add backup tasks to Capistrano add to your 'Capfile' this line:
+Для создания резервных копий с помощью Capistrano добавьте в ваш 'Capfile' эту строку:
 
     require 'leipreachan/capistrano3'
 
-It add new tasks:
+Это добавить следующие задачи в Capistrano:
 
     cap deploy:leipreachan:backup      # Backup database
     cap deploy:leipreachan:list        # List of backups
     cap deploy:leipreachan:restore     # Restore database
 
-If you want to backup database during deploy you should add this line to 'deploy.rb':
+Если вы хотите создать резервную копию в процессе делоя приложения вам необходимо добавить эту строку в 'deploy.rb':
 
     before "deploy:migrate", "deploy:leipreachan:backup"
 
-It creates backup of database before run migrations.
+Резервная копия будет создана перед миграциями базы даных.
 
-By default backup will be created in 'shared/backups' folder, but if you need you can setup custom path via set 'backups_folder' variable:
+По умолчанию резервная копия создается в 'shared/backups', но если у вас есть необходимость установить свой каталог, это можно сделать с помощью переменной 'backups_folder':
 
     set :backups_folder, '../../current'
 
-Gem have a release path as a root folder.
+Gem берет за основу каталог с релизом. Учтите это при установке каталога резервных копий.
 
-### Whenever integration
+### Интергация в Whenever
+
+Просто добавьте эти строки в ваш 'config/schedule.rb':
 
 ```ruby
-  # Simply add next line to your config/schedule.rb
-
   every 1.day, :at => '4:30 am' do
     rake "leipreachan:backup"
   end
-  
-  # you able to manage DIR
+```
+Так же вы можете изменить каталог, куда будут складываться резервные копии. По умолчанию они складываются в './backups', т.е. создается каталог backups в корневом каталоге приложения.
+
+```ruby
   every 1.month, do
-    rake "leipreachan:backup DIR=/tmp/database_backups" # by defaul we use './backups'
-  end
-  
-  # you able to manage number of stored backups
-  every 5.days, do
-    rake "leipreachan:backup MAX=5" # by default we are storing 30
+    rake "leipreachan:backup DIR=/tmp/database_backups"
   end
 ```
+Есть возможность указать сколько дней хранить резервные копии (обратите внимание, что эта настройка не распространяется на количество резервных копий внутри каталога дня; каждый день их может храниться неограниченное количество). По умолчанию хранится 30 каталогов, разбитых по датам.
 
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release` to create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-## Contributing
-
-1. Fork it ( https://github.com/[my-github-username]/leipreachan/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+```ruby
+  every 5.days, do
+    rake "leipreachan:backup MAX=5"
+  end
+```
