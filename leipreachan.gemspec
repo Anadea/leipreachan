@@ -6,7 +6,7 @@ require 'leipreachan/version'
 Gem::Specification.new do |spec|
   spec.name          = "leipreachan"
   spec.version       = Leipreachan::VERSION
-  spec.authors       = ["Dmitriy Lyalyuev, Eugene Maslov"]
+  spec.authors       = ["Anadea Inc (http://anadea.info), Dmitriy Lyalyuev, Eugene Maslov"]
   spec.email         = ["dl@anahoret.com, eum@anahoret.com"]
 
   spec.summary       = %q{Backup and restore your database by the simple way.}
