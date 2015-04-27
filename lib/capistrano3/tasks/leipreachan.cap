@@ -6,7 +6,7 @@ namespace :deploy do
       on roles(:app), in: :sequence, wait: 5 do
         within release_path do
           with rails_env: fetch(:rails_env) do
-            execute :bundle, :exec, :rake, "leipreachan:backup DIR=#{fetch(:folder)}"
+            execute :bundle, :exec, :rake, "leipreachan:backup DIR=#{fetch(:folder)}/backups"
           end
         end
       end
@@ -16,7 +16,7 @@ namespace :deploy do
       on roles(:app), in: :sequence, wait: 5 do
         within release_path do
           with rails_env: fetch(:rails_env) do
-            execute :bundle, :exec, :rake, "leipreachan:list DIR=#{fetch(:folder)}"
+            execute :bundle, :exec, :rake, "leipreachan:list DIR=#{fetch(:folder)}/backups"
           end
         end
       end
@@ -26,7 +26,7 @@ namespace :deploy do
       on roles(:app), in: :sequence, wait: 5 do
         within release_path do
           with rails_env: fetch(:rails_env) do
-            execute :bundle, :exec, :rake, "leipreachan:restore DIR=#{fetch(:folder)}"
+            execute :bundle, :exec, :rake, "leipreachan:restore DIR=#{fetch(:folder)}/backups"
           end
         end
       end

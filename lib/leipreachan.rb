@@ -6,7 +6,9 @@ require 'active_record'
 module Leipreachan
 
   def self.get_backuper_for env
+    binding.pry
     config = ActiveRecord::Base.configurations[env]
+    p config
     require "leipreachan/#{config['adapter']}"
     Backuper.new(env)
   end

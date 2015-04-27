@@ -16,8 +16,7 @@ describe Leipreachan do
   end
 
   it 'Defaults (max, date, dir)' do
-    Leipreachan.get_backuper_for Rails.env
-    instance = Leipreachan::DBBackup.new Rails.env
+    instance = Leipreachan.get_backuper_for Rails.env
 
     expect(instance.max_files).to eq(30)
     expect(instance.directory).to eq("backups")
@@ -25,22 +24,22 @@ describe Leipreachan do
   end
 
   it 'Check MAX from ENV' do
-    instance = Leipreachan::DBBackup.new({'MAX' => 100})
+    instance = Leipreachan.get_backuper_for({'MAX' => 100})
     expect(instance.max_files).to eq(100)
   end
 
   it 'Check DATE from ENV' do
-    instance = Leipreachan::DBBackup.new({'DATE' => "20150404"})
+    instance = Leipreachan.get_backuper_for({'DATE' => "20150404"})
     expect(instance.target_date).to eq("20150404")
   end
 
   it 'Check DIR from ENV' do
-    instance = Leipreachan::DBBackup.new({'DIR' => "blah"})
+    instance = Leipreachan.get_backuper_for({'DIR' => "blah"})
     expect(instance.directory).to eq("blah")
   end
 
   it 'Remove unwanted backups' do
-    instance = Leipreachan::DBBackup.new({'MAX' => 2})
+    instance = Leipreachan.get_backuper_for({'MAX' => 2})
     Dir.unstub(:new)
     folder = File.join(Rails.root, 'backups',Date.current.strftime("%Y%m%d"))
     FileUtils.mkdir_p(folder)
