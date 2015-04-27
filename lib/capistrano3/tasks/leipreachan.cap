@@ -30,7 +30,7 @@ namespace :deploy do
             puts "WARNING!!! YOUR CURRENT DATABASE DATA WILL BE LOST!!!"
             puts "Think twice before enter 'YES' and push the Enter button"
             puts "="*80
-            set :answercheck, ask('Please type "YES" for restore database: ', '')
+            set :answercheck, ask('"YES" for restore last backup of the database: ', 'No')
             if fetch(:answercheck) == 'YES'
               execute :bundle, :exec, :rake, "leipreachan:restorelast DIR=#{fetch(:folder)}"
             end
