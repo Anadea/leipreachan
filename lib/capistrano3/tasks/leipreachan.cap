@@ -1,11 +1,12 @@
 namespace :deploy do
+  set :folder, :backups_folder || '../../shared'
   namespace :leipreachan do
     desc "Backup database"
     task :backup do
       on roles(:app), in: :sequence, wait: 5 do
         within release_path do
           with rails_env: fetch(:rails_env) do
-            execute :bundle, :exec, :rake, "leipreachan:backup"
+            execute :bundle, :exec, :rake, "leipreachan:backup DIR=#{folder}"
           end
         end
       end
@@ -15,7 +16,7 @@ namespace :deploy do
       on roles(:app), in: :sequence, wait: 5 do
         within release_path do
           with rails_env: fetch(:rails_env) do
-            execute :bundle, :exec, :rake, "leipreachan:list"
+            execute :bundle, :exec, :rake, "leipreachan:list DIR=#{folder}"
           end
         end
       end
@@ -25,7 +26,7 @@ namespace :deploy do
       on roles(:app), in: :sequence, wait: 5 do
         within release_path do
           with rails_env: fetch(:rails_env) do
-            execute :bundle, :exec, :rake, "leipreachan:restore"
+            execute :bundle, :exec, :rake, "leipreachan:restore DIR=#{folder}"
           end
         end
       end

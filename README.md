@@ -38,6 +38,12 @@ If you want to backup database during deploy you should add this line to 'deploy
 
 It creates backup of database before run migrations.
 
+By default backup will be created in 'shared/backups' folder, but if you need you can setup custom path via set 'backups_folder' variable:
+
+    set :backups_folder, '../../current'
+
+Gem have a release path as a root folder.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/console` for an interactive prompt that will allow you to experiment.
