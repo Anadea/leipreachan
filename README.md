@@ -1,8 +1,6 @@
 # Leipreachan
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/leipreachan`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Database backup as simple as should be.
 
 ## Installation
 
@@ -22,7 +20,23 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Capistrano 3
+
+For add backup tasks to Capistrano add to your 'Capfile' this line:
+
+    require 'leipreachan/capistrano3'
+
+It add new tasks:
+
+    cap deploy:leipreachan:backup      # Backup database
+    cap deploy:leipreachan:list        # List of backups
+    cap deploy:leipreachan:restore     # Restore database
+
+If you want to backup database during deploy you should add this line to 'deploy.rb':
+
+    before "deploy:migrate", "deploy:leipreachan:backup"
+
+It creates backup of database before run migrations.
 
 ## Development
 
