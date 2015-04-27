@@ -6,11 +6,11 @@ require 'leipreachan/version'
 Gem::Specification.new do |spec|
   spec.name          = "leipreachan"
   spec.version       = Leipreachan::VERSION
-  spec.authors       = ["Anadea Inc (http://anadea.info), Dmitriy Lyalyuev, Eugene Maslov"]
-  spec.email         = ["dl@anahoret.com, eum@anahoret.com"]
+  spec.authors       = ["Anadea Inc team (http://anadea.info)"]
+  spec.email         = ["gemmaker@anahoret.com"]
 
   spec.summary       = %q{Backup and restore your database by the simple way.}
-  spec.description   = %q{Backup and restore your database by the simple way.}
+  spec.description   = %q{Backup and restore your database as simple as posible.}
   spec.homepage      = "https://github.com/anadea/leipreachan"
   spec.license       = "MIT"
 
@@ -25,5 +25,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'railties'
   spec.add_development_dependency "rails"
   spec.add_development_dependency "activerecord"
-
 end
