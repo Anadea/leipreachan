@@ -44,6 +44,26 @@ By default backup will be created in 'shared/backups' folder, but if you need yo
 
 Gem have a release path as a root folder.
 
+### Whenever integration
+
+```ruby
+  # Simply add next line to your config/schedule.rb
+
+  every 1.day, :at => '4:30 am' do
+    rake "leipreachan:backup"
+  end
+  
+  # you able to manage DIR
+  every 1.month, do
+    rake "leipreachan:backup DIR=/tmp/database_backups" # by defaul we use './backups'
+  end
+  
+  # you able to manage number of stored backups
+  every 5.days, do
+    rake "leipreachan:backup MAX=5" # by default we are storing 5
+  end
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/console` for an interactive prompt that will allow you to experiment.
