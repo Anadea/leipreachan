@@ -3,25 +3,28 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'leipreachan/version'
 
-Gem::Specification.new do |spec|
-  spec.name          = "leipreachan"
-  spec.version       = Leipreachan::VERSION
-  spec.authors       = ["Anadea Inc team (http://anadea.info)"]
-  spec.email         = ["gemmaker@anahoret.com"]
+Gem::Specification.new do |s|
+  s.name          = "leipreachan"
+  s.version       = Leipreachan::VERSION
+  s.authors       = ["Anadea Inc team (http://anadea.info)"]
+  s.email         = ["gemmaker@anahoret.com"]
 
-  spec.summary       = %q{Backup and restore your database by the simple way.}
-  spec.description   = %q{Backup and restore your database as simple as posible.}
-  spec.homepage      = "https://github.com/anadea/leipreachan"
-  spec.license       = "MIT"
+  s.summary       = %q{Backup and restore your database by the simple way.}
+  s.description   = %q{Backup and restore your database as simple as posible.}
+  s.homepage      = "https://github.com/anadea/leipreachan"
+  s.license       = "MIT"
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
-  spec.bindir        = "bin"
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.require_paths = ["lib"]
+  s.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  s.bindir        = "bin"
+  s.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  s.require_paths = ["lib"]
 
-  spec.add_development_dependency 'bundler', "~> 1.9"
-  spec.add_development_dependency 'rake', "~> 10.0"
-  spec.add_development_dependency 'rspec'
-  spec.add_development_dependency 'railties'
-  spec.add_development_dependency 'rails'
+  s.required_ruby_version = ">= #{Leipreachan::RUBY_VERSION}"
+
+  s.add_dependency 'bundler', '~> 1.3'
+  s.add_dependency 'rails', "~> #{Leipreachan::RAILS_VERSION}"
+
+  s.add_development_dependency 'rake', "~> 10.0"
+  s.add_development_dependency 'rspec', '>= 3.2.0', '<4'
+  s.add_development_dependency 'railties', "~> #{Leipreachan::RAILS_VERSION}"
 end
