@@ -13,7 +13,7 @@ module Leipreachan
     end
 
     def dbbackup!
-      system("#{password}pg_dump -h #{host} #{db_config['database']} | gzip > #{backup_file}.gz")
+      system("#{password}pg_dump -h #{host} #{user} #{db_config['database']} | gzip > #{backup_file}.gz")
     end
 
     def dbrestore! file
