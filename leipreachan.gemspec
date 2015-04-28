@@ -22,9 +22,9 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= #{Leipreachan::RUBY_VERSION}"
 
   s.add_dependency 'bundler', '~> 1.3'
-  s.add_dependency 'rails', "~> #{Leipreachan::RAILS_VERSION}"
+  s.add_dependency 'rails', ">= #{Leipreachan::RAILS_VERSION}"
 
   s.add_development_dependency 'rake', "~> 10.0"
   s.add_development_dependency 'rspec', '>= 3.2.0', '<4'
-  s.add_development_dependency 'railties', "~> #{Leipreachan::RAILS_VERSION}"
+  s.add_development_dependency 'railties', ">= #{Leipreachan::RAILS_VERSION}"
 end
