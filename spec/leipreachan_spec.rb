@@ -53,8 +53,8 @@ describe Leipreachan do
   context 'MySQL: Backup and restore database without password' do
     before do
       ActiveRecord::Base.stub(:configurations).and_return({'test' => {'adapter' => 'mysql2', 'username' => 'login', 'password' => '', 'database' => 'dbname'}})
-      instance.stub!(:backup_base_on).and_return('.')
-      instance.stub!(:backup_file).and_return('201504040000.sql')
+      instance.stub(:backup_base_on).and_return('.')
+      instance.stub(:backup_file).and_return('201504040000.sql')
     end
 
     let!(:instance) { Leipreachan.get_backuper_for Rails.env }
@@ -74,8 +74,8 @@ describe Leipreachan do
   context "MySQL: Backup and restore with password" do
     before do
       ActiveRecord::Base.stub(:configurations).and_return({'test' => {'adapter' => 'mysql2', 'username' => 'login', 'password' => 'password', 'database' => 'dbname'}})
-      instance.stub!(:backup_base_on).and_return('.')
-      instance.stub!(:backup_file).and_return('201504040000.sql')
+      instance.stub(:backup_base_on).and_return('.')
+      instance.stub(:backup_file).and_return('201504040000.sql')
     end
 
     let!(:instance) { Leipreachan.get_backuper_for Rails.env }
@@ -95,8 +95,8 @@ describe Leipreachan do
   context 'Postgres: Backup and restore with password' do
     before do
       ActiveRecord::Base.stub(:configurations).and_return({'test' => {'adapter' => 'postgresql', 'username' => 'login', 'password' => 'password', 'database' => 'dbname'}})
-      instance.stub!(:backup_base_on).and_return('.')
-      instance.stub!(:backup_file).and_return('201504040000.sql')
+      instance.stub(:backup_base_on).and_return('.')
+      instance.stub(:backup_file).and_return('201504040000.sql')
     end
 
     let!(:instance) { Leipreachan.get_backuper_for Rails.env }
@@ -122,8 +122,8 @@ describe Leipreachan do
   context 'Postgres: Backup and restore without password' do
     before do
       ActiveRecord::Base.stub(:configurations).and_return({'test' => {'adapter' => 'postgresql', 'username' => 'login', 'password' => '', 'database' => 'dbname'}})
-      instance.stub!(:backup_base_on).and_return('.')
-      instance.stub!(:backup_file).and_return('201504040000.sql')
+      instance.stub(:backup_base_on).and_return('.')
+      instance.stub(:backup_file).and_return('201504040000.sql')
     end
 
     let!(:instance) { Leipreachan.get_backuper_for Rails.env }
@@ -149,8 +149,8 @@ describe Leipreachan do
   context 'Other checks' do
     before do
       ActiveRecord::Base.stub(:configurations).and_return({'test' => {'adapter' => 'postgresql', 'username' => 'login', 'password' => 'password', 'database' => 'dbname'}})
-      instance.stub!(:backup_base_on).and_return('.')
-      instance.stub!(:backup_file).and_return('201504040000.sql')
+      instance.stub(:backup_base_on).and_return('.')
+      instance.stub(:backup_file).and_return('201504040000.sql')
     end
 
     let!(:instance) { Leipreachan.get_backuper_for Rails.env }
