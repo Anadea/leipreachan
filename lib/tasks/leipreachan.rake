@@ -6,7 +6,7 @@ namespace :leipreachan do
     require 'leipreachan'
     Leipreachan.get_backuper_for(ENV).list
   end
-  desc 'Restore project database; Options: DIR=backups RAILS_ENV=production MAX=30'
+  desc 'Restore project database; Options: DIR=backups RAILS_ENV=production DAYS=30'
   task restore: [:environment] do
     require 'leipreachan'
     Leipreachan.get_backuper_for(ENV).restore!
@@ -15,7 +15,7 @@ namespace :leipreachan do
     require 'leipreachan'
     Leipreachan.get_backuper_for(ENV).restorelast!
   end
-  desc "Backup project database; Options: DIR=backups RAILS_ENV=production MAX=30"
+  desc "Backup project database; Options: DIR=backups RAILS_ENV=production DAYS=30"
   task backup: [:environment] do
     require 'leipreachan'
     Leipreachan.get_backuper_for(ENV).backup!

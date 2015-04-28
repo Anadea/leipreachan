@@ -17,14 +17,14 @@ describe Leipreachan do
   it 'Defaults (max, date, dir)' do
     instance = Leipreachan.get_backuper_for Rails.env
 
-    expect(instance.max_files).to eq(30)
+    expect(instance.max_days).to eq(30)
     expect(instance.directory).to eq("backups")
     expect(instance.target_date).to eq(Date.current.strftime("%Y%m%d"))
   end
 
-  it 'Check MAX from ENV' do
-    instance = Leipreachan.get_backuper_for({'MAX' => 100})
-    expect(instance.max_files).to eq(100)
+  it 'Check DAYS from ENV' do
+    instance = Leipreachan.get_backuper_for({'DAYS' => 100})
+    expect(instance.max_days).to eq(100)
   end
 
   it 'Check DATE from ENV' do
@@ -38,20 +38,13 @@ describe Leipreachan do
   end
 
   it 'Remove unwanted backups' do
-    instance = Leipreachan.get_backuper_for({'MAX' => 2})
+    instance = Leipreachan.get_backuper_for({'DAYS' => 2})
     Dir.unstub(:new)
-    folder = File.join(Rails.root, 'backups',Date.current.strftime("%Y%m%d"))
-    FileUtils.mkdir_p(folder)
-    FileUtils.touch("#{folder}/201504010000.sql.gz")
-    FileUtils.touch("#{folder}/201504010001.sql.gz")
-    FileUtils.touch("#{folder}/201504010002.sql.gz")
-    FileUtils.touch("#{folder}/201504010003.sql.gz")
-    FileUtils.touch("#{folder}/201504010004.sql.gz")
-    FileUtils.touch("#{folder}/201504010005.sql.gz")
-    FileUtils.touch("#{folder}/201504010006.sql.gz")
-
+    10.times.each  do |item|
+      FileUtils.mkdir_p(File.join(instance.send(:base_path), (Date.current - item.day).strftime("%Y%m%d")))
+    end
     instance.send(:remove_unwanted_backups)
-    expect(instance.send(:backup_folder_items)).to eq(['201504010006.sql.gz', '201504010005.sql.gz'])
+    expect(Dir.new(instance.send(:base_path)).entries.sort).to eq(['.', '..', Date.current.strftime("%Y%m%d"), (Date.current - 1.day).strftime("%Y%m%d")].sort)
     FileUtils.rm_rf(Rails.root)
   end
 

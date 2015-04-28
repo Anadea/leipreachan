@@ -12,13 +12,13 @@ module Leipreachan
   end
 
   class DBBackup
-    MAX_FILES = 30
+    MAX_DAYS = 30
     DIRECTORY = 'backups'
 
-    attr_accessor :max_files, :directory, :target_date
+    attr_accessor :max_days, :directory, :target_date
 
     def initialize env
-      @max_files = (env['MAX'] || MAX_FILES).to_i
+      @max_days = (env['DAYS'] || MAX_DAYS).to_i
       @target_date = env['DATE'] || Time.now.strftime("%Y%m%d")
       @directory = env['DIR'] || DIRECTORY
       datetime_stamp = Time.now.strftime("%Y%m%d%H%M%S")
@@ -89,14 +89,18 @@ module Leipreachan
       @backup_file
     end
 
-    def remove_unwanted_backups
-      all_backups = backup_folder_items
+    def base_path
+      @base_path
+    end
 
-      max_backups = (@max_files if @max_files > 0) || MAX_FILES
+    def remove_unwanted_backups
+      all_backups = Dir.new(base_path).entries.select{|folder| folder.match(/\d{8}/)}.sort.reverse
+
+      max_backups = (@max_days if @max_days > 0) || MAX_DAYS
       unwanted_backups = all_backups[max_backups..-1] || []
 
       for unwanted_backup in unwanted_backups
-        FileUtils.rm_rf(File.join(backup_base_on(@target_date), unwanted_backup))
+        FileUtils.rm_rf(File.join(base_path, unwanted_backup))
       end
       puts "Deleted #{unwanted_backups.length} backups, #{all_backups.length - unwanted_backups.length} backups available"
     end
