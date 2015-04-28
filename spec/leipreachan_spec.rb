@@ -19,7 +19,8 @@ describe Leipreachan do
 
     expect(instance.max_days).to eq(30)
     expect(instance.directory).to eq("backups")
-    expect(instance.target_date).to eq(Date.current.strftime("%Y%m%d"))
+    expect(instance.backup_folder).to eq(Date.current.strftime("%Y%m%d"))
+    expect(instance.target_date).to eq(nil)
   end
 
   it 'Check DAYS from ENV' do
@@ -29,7 +30,8 @@ describe Leipreachan do
 
   it 'Check DATE from ENV' do
     instance = Leipreachan.get_backuper_for({'DATE' => "20150404"})
-    expect(instance.target_date).to eq("20150404")
+    expect(instance.backup_folder).to eq('20150404')
+    expect(instance.target_date).to eq('20150404')
   end
 
   it 'Check DIR from ENV' do

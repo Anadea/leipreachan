@@ -4,10 +4,9 @@ require 'rails'
 require 'active_record'
 
 module Leipreachan
-
   def self.get_backuper_for env
-    config = ActiveRecord::Base.configurations[Rails.env]
-    require "leipreachan/#{config['adapter']}"
+    db_config = ActiveRecord::Base.configurations[Rails.env]
+    require "leipreachan/#{db_config['adapter']}"
     Backuper.new(env)
   end
 
@@ -15,25 +14,34 @@ module Leipreachan
     MAX_DAYS = 30
     DIRECTORY = 'backups'
 
-    attr_accessor :max_days, :directory, :target_date
+    attr_accessor :max_days,
+                  :directory,
+                  :target_date,
+                  :backup_folder,
+                  :backup_file,
+                  :base_path,
+                  :db_config
 
     def initialize env
       @max_days = (env['DAYS'] || MAX_DAYS).to_i
-      @target_date = env['DATE'] || Time.now.strftime("%Y%m%d")
+      @target_date = env['DATE']
+      @backup_folder = env['DATE'] || Time.now.strftime("%Y%m%d")
       @directory = env['DIR'] || DIRECTORY
       datetime_stamp = Time.now.strftime("%Y%m%d%H%M%S")
-      @base_path = File.join(Rails.root, @directory)
+      @base_path = File.join(Rails.root, directory)
 
       file_name = "#{datetime_stamp}.sql"
-      @backup_file = File.join(backup_base_on(@target_date), file_name)
+      @backup_file = File.join(backup_base_on(backup_folder), file_name)
 
       @db_config = ActiveRecord::Base.configurations[Rails.env]
     end
 
     def backup!
-      FileUtils.mkdir_p(backup_base_on(@target_date))
+      FileUtils.mkdir_p(backup_base_on(backup_folder))
       dbbackup!
-      puts "Created backup: #{@backup_file}.gz"
+      puts "Created backup: #{backup_file}.gz"
+      backups_count = Dir.new(backup_base_on(backup_folder)).entries.select{|name| name.match(/sql.gz$/)}.size
+      puts "#{backups_count} buckups available for #{backup_folder} date"
 
       remove_unwanted_backups
     end
@@ -47,11 +55,7 @@ module Leipreachan
     end
 
     def list
-      if @target_date.present?
-        single_date @target_date
-      else
-        all_dates
-      end
+      target_date.present? ? single_date(target_date) : all_dates
     end
 
     private
@@ -61,7 +65,7 @@ module Leipreachan
     end
 
     def all_dates
-      list = Dir.new(@base_path).entries.select{|name| name.match(/\d+/)}.sort
+      list = Dir.new(base_path).entries.select{|name| name.match(/\d+/)}.sort
       list.first(list.size - 1).each_with_index do |folder, index|
         count = get_backups_list(folder).size
         puts "-> #{folder}: #{count}"
@@ -77,32 +81,20 @@ module Leipreachan
       end
     end
 
-    def config
-      @db_config
-    end
-
     def backup_base_on target_date
-      File.join(@base_path, target_date)
-    end
-
-    def backup_file
-      @backup_file
-    end
-
-    def base_path
-      @base_path
+      File.join(base_path, target_date)
     end
 
     def remove_unwanted_backups
       all_backups = Dir.new(base_path).entries.select{|folder| folder.match(/\d{8}/)}.sort.reverse
 
-      max_backups = (@max_days if @max_days > 0) || MAX_DAYS
+      max_backups = (max_days if max_days > 0) || MAX_DAYS
       unwanted_backups = all_backups[max_backups..-1] || []
 
       for unwanted_backup in unwanted_backups
         FileUtils.rm_rf(File.join(base_path, unwanted_backup))
       end
-      puts "Deleted #{unwanted_backups.length} backups, #{all_backups.length - unwanted_backups.length} backups available"
+      puts "Deleted #{unwanted_backups.length} days, #{all_backups.length - unwanted_backups.length} days available"
     end
 
     def get_file_for_restore
@@ -123,7 +115,7 @@ module Leipreachan
     end
 
     def backup_folder_items
-      get_backups_list(@target_date).reverse
+      get_backups_list(backup_folder).reverse
     end
   end
 end
