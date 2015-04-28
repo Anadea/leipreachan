@@ -19,15 +19,16 @@ module Leipreachan
     def dbrestore! file
       puts "Will be restored -> #{file}"
       puts ""
-      drop_pg!
+      drop_tables!
       system("zcat < #{backup_base_on(backup_folder)}/#{file} | #{password}psql -h #{host} #{user} #{db_config['database']}")
     end
 
     private
 
-    def drop_pg!
-      drop_table_query = "drop schema public cascade; create schema public;"
-      system("echo \"#{drop_table_query}\" | #{password}psql -h #{host} #{user} #{db_config['database']}")
+    def drop_tables!
+      # drop_table_query = "drop schema public cascade; create schema public;"
+      system("#{password}psql -h #{host} #{user} #{db_config['database']} -t -c \"select 'drop table \\\"' || tablename || '\\\" cascade;' from pg_tables where schemaname = 'public'\"  | #{password}psql -h #{host} #{user} #{db_config['database']}");
+      # system("echo \"#{drop_table_query}\" | #{password}psql -h #{host} #{user} #{db_config['database']}")
     end
   end
 end
