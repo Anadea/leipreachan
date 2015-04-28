@@ -1,0 +1,28 @@
+Capistrano::Configuration.instance(:must_exist).load do
+  namespace :deploy do
+    set :folder, fetch(:backups_folder, '../../shared/backups')
+    namespace :leipreachan do
+      desc "Backup database"
+      task :backup, role: :app do
+        run "cd #{latest_release} && RAILS_ENV=#{fetch(:rails_env)} bundle exec rake leipreachan:backup DIR=#{fetch(:folder)}"
+      end
+
+      desc "List of backups"
+      task :list, role: :app do
+        run "cd #{latest_release} && RAILS_ENV=#{fetch(:rails_env)} bundle exec rake leipreachan:list DIR=#{fetch(:folder)}"
+      end
+
+      desc "Restore database"
+      task :restore, role: :app do
+        puts "="*80
+        puts "  WARNING!!! YOUR CURRENT DATABASE DATA WILL BE LOST!!!"
+        puts "  Think twice before enter 'YES' and push the Enter button"
+        puts "="*80
+        answer = Capistrano::CLI.ui.ask "  \"YES\" for restore last backup of the database: '"
+        if answer == 'YES' then
+          run "cd #{latest_release} && RAILS_ENV=#{fetch(:rails_env)} bundle exec rake leipreachan:restorelast DIR=#{fetch(:folder)}"
+        end
+      end
+    end
+  end
+end
