@@ -41,7 +41,7 @@ module Leipreachan
       dbbackup!
       puts "Created backup: #{backup_file}.gz"
       backups_count = Dir.new(backup_base_on(backup_folder)).entries.select{|name| name.match(/sql.gz$/)}.size
-      puts "#{backups_count} buckups available for #{backup_folder} date"
+      puts "#{backups_count} backups available for #{backup_folder} date"
 
       remove_unwanted_backups
     end
