@@ -26,13 +26,25 @@ namespace :deploy do
       on roles(:app) do
         within current_path do
           with rails_env: fetch(:rails_env) do
+            execute :bundle, :exec, :rake, "leipreachan:list DIR=#{fetch(:folder)}"
+            set :date, ask('Please specify date (default: last one)', '')
+            puts "Your choice: #{fetch(:date)}"
+
+            if fetch(:date).strip! != ''
+              execute :bundle, :exec, :rake, "leipreachan:list DIR=#{fetch(:folder)} DATE=#{fetch(:date)}"
+            end
+
+            set :filename, ask('Please specify filename for restore (default: last one)', '')
+            puts "Your choice: #{fetch(:filename)}"
+
             puts "="*80
             puts "WARNING!!! YOUR CURRENT DATABASE DATA WILL BE LOST!!!"
             puts "Think twice before enter 'YES' and push the Enter button"
             puts "="*80
+
             set :answercheck, ask('"YES" for restore last backup of the database: ', 'No')
             if fetch(:answercheck) == 'YES'
-              execute :bundle, :exec, :rake, "leipreachan:restorelast DIR=#{fetch(:folder)}"
+              execute :bundle, :exec, :rake, "leipreachan:restorefile DIR=#{fetch(:folder)} DATE=#{fetch(:date)} FILE=#{fetch(:filename)}"
             end
           end
         end

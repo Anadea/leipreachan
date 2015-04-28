@@ -20,15 +20,17 @@ module Leipreachan
                   :backup_folder,
                   :backup_file,
                   :base_path,
-                  :db_config
+                  :db_config,
+                  :file_for_restore
 
     def initialize env
       @max_days = (env['DAYS'] || MAX_DAYS).to_i
       @target_date = env['DATE']
-      @backup_folder = env['DATE'] || Time.now.strftime("%Y%m%d")
+      @backup_folder = env['DATE'].presence || Time.now.strftime("%Y%m%d")
       @directory = env['DIR'] || DIRECTORY
       datetime_stamp = Time.now.strftime("%Y%m%d%H%M%S")
       @base_path = File.join(Rails.root, directory)
+      @file_for_restore = env['FILE']
 
       file_name = "#{datetime_stamp}.sql"
       @backup_file = File.join(backup_base_on(backup_folder), file_name)
@@ -50,8 +52,8 @@ module Leipreachan
       dbrestore! get_file_for_restore
     end
 
-    def restorelast!
-      dbrestore! get_lastfile_for_restore
+    def restorefile!
+      dbrestore! file_for_restore || get_lastfile_for_restore
     end
 
     def list
