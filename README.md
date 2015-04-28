@@ -20,11 +20,15 @@ gem 'leipreachan'
 
 ## Использование
 
-### Capistrano 3
+### Capistrano 2/3
 
-Для создания резервных копий с помощью Capistrano добавьте в ваш 'Capfile' эту строку:
+Для создания резервных копий с помощью Capistrano 3 добавьте в ваш 'Capfile' эту строку:
 
     require 'leipreachan/capistrano3'
+
+В случае Capistrano 2 необходимо в файл 'deploy.rb' добавить эту строку:
+
+    require 'leipreachan/capistrano2'
 
 Это добавит следующие задачи в Capistrano:
 
