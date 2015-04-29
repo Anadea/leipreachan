@@ -20,7 +20,7 @@ module Leipreachan
       puts "Will be restored -> #{file}"
       puts ""
       drop_tables!
-      system("zcat < #{backup_base_on(backup_folder)}/#{file} | #{password}psql -h #{host} #{user} #{db_config['database']}")
+      system("zcat < #{file} | #{password}psql -h #{host} #{user} #{db_config['database']}")
     end
 
     private

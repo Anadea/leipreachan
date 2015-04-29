@@ -17,7 +17,7 @@ module Leipreachan
     end
 
     def dbrestore! file
-      system("zcat < #{backup_base_on(backup_folder)}/#{file} | mysql -h #{host} #{user} #{password}#{db_config['database']}")
+      system("zcat < #{file} | mysql -h #{host} #{user} #{password}#{db_config['database']}")
     end
 
     private

@@ -49,11 +49,11 @@ module Leipreachan
     end
 
     def restore!
-      dbrestore! get_file_for_restore
+      dbrestore! File.join(backup_base_on(backup_folder), get_file_for_restore)
     end
 
     def restorefile!
-      dbrestore! file_for_restore || get_lastfile_for_restore
+      dbrestore! File.join(backup_base_on(backup_folder), file_for_restore || get_lastfile_for_restore)
     end
 
     def list
