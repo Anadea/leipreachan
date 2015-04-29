@@ -45,7 +45,8 @@ namespace :deploy do
 
             set :answercheck, ask('"YES" for restore last backup of the database: ', 'No')
             if fetch(:answercheck) == 'YES'
-              execute :bundle, :exec, :rake, "leipreachan:restorefile DIR=#{fetch(:folder)} DATE=#{fetch(:date)} FILE=#{fetch(:filename)}"
+              filename = filename.nil? ? '' : "FILE=#{filename.strip}"
+              execute :bundle, :exec, :rake, "leipreachan:restorefile DIR=#{fetch(:folder)} DATE=#{fetch(:date)} #{fetch(:filename)}"
             end
           end
         end
