@@ -9,7 +9,8 @@ Capistrano::Configuration.instance(:must_exist).load do
 
       desc "List of backups"
       task :list, role: :app do
-        run "cd #{latest_release} && RAILS_ENV=#{fetch(:rails_env)} bundle exec rake leipreachan:list DIR=#{fetch(:folder)}"
+        set :date, ENV['DATE'].nil? ? '' : "DATE=#{ENV['DATE']}"
+        run "cd #{latest_release} && RAILS_ENV=#{fetch(:rails_env)} bundle exec rake leipreachan:list DIR=#{fetch(:folder)} #{fetch(:date)}"
       end
 
       desc "Restore database"
