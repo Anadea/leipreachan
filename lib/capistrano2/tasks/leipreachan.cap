@@ -14,13 +14,25 @@ Capistrano::Configuration.instance(:must_exist).load do
 
       desc "Restore database"
       task :restore, role: :app do
+        run "cd #{latest_release} && RAILS_ENV=#{fetch(:rails_env)} bundle exec rake leipreachan:list DIR=#{fetch(:folder)}"
+        date = Capistrano::CLI.ui.ask('Please specify date (default: latest one)')
+        puts "Your choice: #{date.strip == '' ? 'Latest one' : date.strip}"
+
+        unless date.strip == ''
+          run "cd #{latest_release} && RAILS_ENV=#{fetch(:rails_env)} bundle exec rake leipreachan:list DIR=#{fetch(:folder)} DATE=#{date}"
+        end
+
+        filename = Capistrano::CLI.ui.ask('Please specify filename for restore (default: latest one)')
+        puts "Your choice: #{filename.strip == '' ? 'Latest one' : filename.strip}"
+
         puts "="*80
-        puts "  WARNING!!! YOUR CURRENT DATABASE DATA WILL BE LOST!!!"
-        puts "  Think twice before enter 'YES' and push the Enter button"
+        puts "WARNING!!! YOUR CURRENT DATABASE DATA WILL BE LOST!!!"
+        puts "Think twice before enter 'YES' and push the Enter button"
         puts "="*80
-        answer = Capistrano::CLI.ui.ask "  \"YES\" for restore last backup of the database: '"
-        if answer == 'YES' then
-          run "cd #{latest_release} && RAILS_ENV=#{fetch(:rails_env)} bundle exec rake leipreachan:restorelast DIR=#{fetch(:folder)}"
+
+        answercheck = Capistrano::CLI.ui.ask('"YES" for restore last backup of the database: ')
+        if answercheck.strip == 'YES'
+          run "cd #{latest_release} && RAILS_ENV=#{fetch(:rails_env)} bundle exec rake leipreachan:restorefile DIR=#{fetch(:folder)} DATE=#{date} FILE=#{filename}"
         end
       end
     end
