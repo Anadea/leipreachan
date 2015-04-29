@@ -1,0 +1,16 @@
+v1.1.0
+[+] Allow restore any backup via Capistarano
+
+v1.0.3
+[+] English doc
+[+] Capistrano 2 support
+[+] Allow restore lasts backup via Capistarano
+[+] Drop tables before restore
+[*] Fix postgresql backup
+
+v1.0.2
+[*] Update gemspec
+[*] Decrease depend gem versions
+
+v1.0.0:
+[+] Initial version
