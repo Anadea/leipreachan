@@ -1,5 +1,9 @@
 module Leipreachan
   class Backuper < DBBackup
+    def system_check_list
+      %w(gzip zcat psql pg_dump)
+    end
+
     def user
       @user ||= db_config['user'].present? ? "-U #{db_config['user']}" : ""
     end
@@ -26,9 +30,7 @@ module Leipreachan
     private
 
     def drop_tables!
-      # drop_table_query = "drop schema public cascade; create schema public;"
       system("#{password}psql -h #{host} #{user} #{db_config['database']} -t -c \"select 'drop table \\\"' || tablename || '\\\" cascade;' from pg_tables where schemaname = 'public'\"  | #{password}psql -h #{host} #{user} #{db_config['database']}");
-      # system("echo \"#{drop_table_query}\" | #{password}psql -h #{host} #{user} #{db_config['database']}")
     end
   end
 end

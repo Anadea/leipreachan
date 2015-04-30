@@ -2,6 +2,7 @@ v1.1.1
 [*] Fix empty file name while restore
 [+] Allow list with param DATE via Capistrano
 [+] Add check for file and folder exist
+[+] Add check for system dependencies
 
 v1.1.0
 [+] Allow restore any backup via Capistarano

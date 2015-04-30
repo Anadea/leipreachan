@@ -24,6 +24,7 @@ module Leipreachan
                   :file_for_restore
 
     def initialize env
+      check_system_requirements!
       @max_days = (env['DAYS'] || MAX_DAYS).to_i
       @target_date = env['DATE']
       @backup_folder = env['DATE'].presence || Time.now.strftime("%Y%m%d")
@@ -36,6 +37,13 @@ module Leipreachan
       @backup_file = File.join(backup_base_on(backup_folder), file_name)
 
       @db_config = ActiveRecord::Base.configurations[Rails.env]
+    end
+
+    def check_system_requirements!
+      system_check_list.each do |command|
+        system("#{command} --help > /dev/null 2>&1")
+        raise "#{command} is required for Leipreachan backups" if $?.exitstatus > 0
+      end
     end
 
     def backup!
