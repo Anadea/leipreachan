@@ -4,19 +4,17 @@ module Rails; end unless defined?(Rails)
 
 describe Leipreachan do
   before do
-    ActiveRecord::Base.stub(:configurations).and_return({'test' => {'adapter' => 'mysql2', 'username' => 'login', 'password' => 'password', 'database' => 'dbname'}})
-    Rails.stub(:root).and_return('/tmp/Rails')
-    Rails.stub(:env).and_return('test')
+    stub_config('adapter', 'mysql2')
     Dir.stub(:new).and_return(['.', '..', '.DStore', '20150404000000.sql.gz', '20150403000000.sql.gz'])
   end
+
+  let!(:instance) { Leipreachan.get_backuper_for Rails.env }
 
   it 'Has a version number' do
     expect(Leipreachan::VERSION).not_to be nil
   end
 
   it 'Defaults (max, date, dir)' do
-    instance = Leipreachan.get_backuper_for Rails.env
-
     expect(instance.max_days).to eq(30)
     expect(instance.directory).to eq("backups")
     expect(instance.backup_folder).to eq(Date.current.strftime("%Y%m%d"))
@@ -52,12 +50,9 @@ describe Leipreachan do
 
   context 'Other checks' do
     before do
-      ActiveRecord::Base.stub(:configurations).and_return({'test' => {'adapter' => 'postgresql', 'username' => 'login', 'password' => 'password', 'database' => 'dbname'}})
       instance.stub(:backup_base_on).and_return('.')
       instance.stub(:backup_file).and_return('201504040000.sql')
     end
-
-    let!(:instance) { Leipreachan.get_backuper_for Rails.env }
 
     it 'backup_base_on return correct array' do
       expect(instance.send(:backup_folder_items)).to eq(['20150404000000.sql.gz', '20150403000000.sql.gz'])
@@ -65,8 +60,6 @@ describe Leipreachan do
   end
 
   context 'Exceptions checks' do
-    let!(:instance) { Leipreachan.get_backuper_for Rails.env }
-
     it 'Check not found command' do
       instance.stub(:system_check_list).and_return(['11243111'])
       expect { instance.check_system_requirements! }.to raise_error(RuntimeError, '11243111 is required for Leipreachan backups')
