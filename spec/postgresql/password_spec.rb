@@ -20,7 +20,7 @@ describe Leipreachan do
     end
 
     it 'Backup' do
-      expect(instance.send(:dbbackup!)).to eq "PGPASSWORD='password' pg_dump -h localhost -U login dbname | gzip > 201504040000.sql.gz"
+      expect(instance.dbbackup!).to eq "PGPASSWORD='password' pg_dump -h localhost -U login dbname | gzip > 201504040000.sql.gz"
     end
 
     it 'Drop old content' do
@@ -38,7 +38,7 @@ describe Leipreachan do
     end
 
     it 'Backup' do
-      expect(instance.send(:dbbackup!)).to eq "pg_dump -h localhost -U login dbname | gzip > 201504040000.sql.gz"
+      expect(instance.dbbackup!).to eq "pg_dump -h localhost -U login dbname | gzip > 201504040000.sql.gz"
     end
 
     it 'Drop old content' do
