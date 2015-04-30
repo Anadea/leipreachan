@@ -1,5 +1,9 @@
 module Leipreachan
   class Backuper < DBBackup
+    def system_check_list
+      %w(gzip zcat mysql mysqldump)
+    end
+
     def user
       @user ||= db_config['username'].present? ? "-u#{db_config['username']}" : ""
     end
