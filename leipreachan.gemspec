@@ -28,4 +28,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec', '>= 3.2.0', '<4'
   s.add_development_dependency 'railties', ">= #{Leipreachan::RAILS_VERSION}"
   s.add_development_dependency 'simplecov'
+  s.add_development_dependency 'simplecov-json'
+  s.add_development_dependency 'simplecov-rcov'
 end
