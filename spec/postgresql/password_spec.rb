@@ -3,9 +3,6 @@ require 'spec_helper'
 describe Leipreachan do
   before do
     stub_config('adapter', 'postgresql')
-    stub_config('user', 'login')
-    stub_config('host', 'localhost')
-    stub_config('database', 'dbname')
     instance.stub(:backup_base_on).and_return('.')
     instance.stub(:backup_file).and_return('201504040000.sql')
     instance.stub(:system) { |arg| arg }
@@ -16,7 +13,7 @@ describe Leipreachan do
 
   context "Postgresql: with password" do
     before do
-      stub_config('password', 'password')
+      instance.stub(:db_config).and_return({'username' => 'login', 'host' => 'localhost', 'database' => 'dbname', 'password' => 'password'})
     end
 
     it 'Backup' do
@@ -34,7 +31,7 @@ describe Leipreachan do
 
   context "Postgresql: without password" do
     before do
-      stub_config('password', '')
+      instance.stub(:db_config).and_return({'username' => 'login', 'host' => 'localhost', 'database' => 'dbname', 'password' => ''})
     end
 
     it 'Backup' do
