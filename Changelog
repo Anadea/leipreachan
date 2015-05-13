@@ -1,3 +1,6 @@
+v1.1.2
+[*] Fix postgres username in database.yml
+
 v1.1.1
 [*] Fix empty file name while restore
 [+] Allow list with param DATE via Capistrano
