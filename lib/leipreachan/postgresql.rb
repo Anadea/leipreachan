@@ -5,6 +5,7 @@ module Leipreachan
     end
 
     def user
+      db_config['user'] = db_config['username'] if db_config['username']
       @user ||= db_config['user'].present? ? "-U #{db_config['user']}" : ""
     end
 
